@@ -70,7 +70,6 @@ Built for Samaritan’s Purse Developer Interview
 Portfolio: github.com/ChloeLeeFullStackDeveloper
 
 📸 Screenshots
-Add a screenshot of your frontend and Swagger here.
 ![alt text](<Screenshot 2025-06-30 at 11.08.06 AM.png>)
 
 ✅ License
