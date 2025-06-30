@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    input {
+      margin: 5px;
+      padding: 6px;
+    }
+
+    button {
+      margin: 5px;
+      padding: 6px;
+    }
+
+    .product-list {
+      margin-top: 20px;
+    }
+
+    .product-item {
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .product-item h3 {
+      margin: 0;
+    }
+
+    .product-item p {
+      margin: 5px 0;
+    }
+
+    .product-item button {
+      margin-left: 10px;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid #ccc;
+      border-collapse: collapse;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .success {
+      color: green;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Inventory Tracker</h1>
+  <form id="productForm">
+    <input type="text" id="name" placeholder="Product Name" required>
+    <input type="number" id="quantity" placeholder="Quantity" required>
+    <input type="number" id="price" placeholder="Price" required>
+    <button type="submit">Add Product</button>
+    <p id="error" class="error"></p>
+    <p id="success" class="success"></p>
+    <h2>Product List</h2>
+  </form>
+
+  <table id="productTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Quantity</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <script>
+    const apiBaseUrl = "http://localhost:5000/api/product";
+    const tableBody = document.querySelector("#productTable tbody");
+
+    window.onload = async function () {
+      try {
+        const response = await fetch(`${apiBaseUrl}`);
+        const products = await response.json();
+
+        tableBody.innerHTML = "";
+
+        products.forEach(product => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+              <td>${product.id}</td>
+              <td>${product.name}</td>
+              <td>${product.quantity}</td>
+              <td>${product.price.toFixed(2)}</td>
+              <td><button onclick="deleteProduct(${product.id})">Delete</button></td>
+          `;
+          tableBody.appendChild(row);
+        });
+      } catch (error) {
+        console.error("Failed to load products:", error);
+      }
+    };
+
+    async function deleteProduct(id) {
+      if (!confirm("Are you sure you want to delete this product?")) return;
+
+      try {
+        const res = await fetch(`${apiBaseUrl}/${id}`, {
+          method: "DELETE",
+        });
+
+        if (res.ok) {
+          alert("Product deleted successfully");
+          window.onload();
+        } else {
+          alert("Failed to delete product");
+        }
+      } catch (error) {
+        console.error("Error deleting product:", error);
+      }
+    }
+    document.getElementById("productForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const quantity = parseInt(document.getElementById("quantity").value);
+      const price = parseFloat(document.getElementById("price").value);
+
+      const newProduct = { name, quantity, price };
+      try {
+        const response = await fetch(`${apiBaseUrl}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newProduct),
+        });
+
+        if (response.ok) {
+          alert("Product added successfully");
+          window.onload();
+          document.getElementById("productForm").reset();
+        } else {
+          alert("Failed to add product");
+        }
+      } catch (error) {
+        console.error("Error adding product:", error);
+      }
+    });
+
+  </script>
+</body>
+
+</html>
