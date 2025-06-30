@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inventory Tracker</title>
+  <link rel="stylesheet" href="styles.css">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -57,6 +58,7 @@
     }
 
     th {
+      text-align: center;
       background-color: #f2f2f2;
     }
 
@@ -73,10 +75,10 @@
 <body>
   <h1>Inventory Tracker</h1>
   <form id="productForm">
-    <input type="text" id="name" placeholder="Product Name" required>
-    <input type="number" id="quantity" placeholder="Quantity" required>
-    <input type="number" id="price" placeholder="Price" required>
-    <button type="submit">Add Product</button>
+    <input type="text" id="name" placeholder="Product Name" required />
+    <input type="number" id="quantity" placeholder="Quantity" min="1" step="1" required />
+    <input type="number" id="price" placeholder="Price" min="0.01" step="0.01" required />
+    <button type="submit" id="submitBtn">Add Product</button>
     <p id="error" class="error"></p>
     <p id="success" class="success"></p>
     <h2>Product List</h2>
@@ -89,6 +91,7 @@
         <th>Name</th>
         <th>Quantity</th>
         <th>Price</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -96,6 +99,7 @@
   <script>
     const apiBaseUrl = "http://localhost:5000/api/product";
     const tableBody = document.querySelector("#productTable tbody");
+    let editingProductId = null;
 
     window.onload = async function () {
       try {
@@ -111,7 +115,9 @@
               <td>${product.name}</td>
               <td>${product.quantity}</td>
               <td>${product.price.toFixed(2)}</td>
-              <td><button onclick="deleteProduct(${product.id})">Delete</button></td>
+              <td>
+                <button onclick="editProduct(${product.id}, '${product.name}', ${product.quantity}, ${product.price})">Edit</button>
+                <button onclick="deleteProduct(${product.id})">Delete</button></td>
           `;
           tableBody.appendChild(row);
         });
@@ -119,6 +125,50 @@
         console.error("Failed to load products:", error);
       }
     };
+
+    function editProduct(id, name, quantity, price) {
+      nameInput.value = name;
+      quantityInput.value = quantity;
+      priceInput.value = price;
+      submitBtn.textContent = "Update Product";
+
+      submitBtn.onclick = async function () {
+        const updatedName = nameInput.value.trim();
+        const updatedQuantity = parseInt(quantityInput.value.trim());
+        const updatedPrice = parseFloat(priceInput.value.trim());
+
+        if (!updatedName) return alert("Product name is required.");
+        if (isNaN(updatedQuantity) || updatedQuantity <= 0) return alert("Enter a valid quantity.");
+        if (isNaN(updatedPrice) || updatedPrice <= 0) return alert("Enter a valid price.");
+
+        const updatedProduct = {
+          id,
+          name: updatedName,
+          quantity: updatedQuantity,
+          price: updatedPrice,
+        };
+
+        try {
+          const response = await fetch(`${apiBaseUrl}/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedProduct),
+          });
+
+          if (!response.ok) throw new Error("Failed to update product.");
+
+          alert("Product updated successfully.");
+          window.onload();
+          document.getElementById("productForm").reset();
+          editingProductId = null;
+        } catch (error) {
+          alert(`Error: ${error.message}`);
+
+        }
+      }
+    }
 
     async function deleteProduct(id) {
       if (!confirm("Are you sure you want to delete this product?")) return;
@@ -138,6 +188,7 @@
         console.error("Error deleting product:", error);
       }
     }
+
     document.getElementById("productForm").addEventListener("submit", async function (e) {
       e.preventDefault();
 
@@ -145,28 +196,85 @@
       const quantity = parseInt(document.getElementById("quantity").value);
       const price = parseFloat(document.getElementById("price").value);
 
-      const newProduct = { name, quantity, price };
+      const ProductData = { name, quantity, price };
       try {
-        const response = await fetch(`${apiBaseUrl}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newProduct),
-        });
+        if (editingProductId) {
+          const response = await fetch(`${apiBaseUrl}/${editingProductId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(ProductData),
+          });
 
-        if (response.ok) {
-          alert("Product added successfully");
-          window.onload();
-          document.getElementById("productForm").reset();
+          if (response.ok) {
+            alert("Product updated successfully");
+            window.onload();
+            document.getElementById("productForm").reset();
+            editingProductId = null;
+          } else {
+            alert("Failed to update product");
+          }
+          editingProductId = null;
+          document.getElementById("submitBtn").innerText = "Add Product";
         } else {
-          alert("Failed to add product");
+          const response = await fetch(`${apiBaseUrl}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(ProductData),
+          });
+
+          if (response.ok) {
+            alert("Product added successfully");
+            window.onload();
+            document.getElementById("productForm").reset();
+          } else {
+            alert("Failed to add product");
+          }
         }
+
       } catch (error) {
         console.error("Error adding product:", error);
       }
     });
+    const form = document.getElementById("productForm");
+    const nameInput = document.getElementById("name");
+    const quantityInput = document.getElementById("quantity");
+    const priceInput = document.getElementById("price");
 
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const name = nameInput.value.trim();
+      const quantity = parseInt(quantityInput.value.trim());
+      const price = parseFloat(priceInput.value.trim());
+
+      if (!name) return alert("Product name is required.");
+      if (isNan(quantity) || quantity <= 0) return alert("Enter a valid quantity.");
+      if (isNaN(price) || price <= 0) return alert("Enter a valid price.");
+
+      const ProductData = { name, quantity, price };
+
+      try {
+        const response = await fetch("http://localhost:5000/api/Product", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(ProductData),
+        });
+
+        if (!response.ok) throw new Error("Failed to add product.");
+
+        alert("Product added successfully.");
+        form.reset();
+        loadProducts();
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+      }
+    });
   </script>
 </body>
 
