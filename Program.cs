@@ -1,3 +1,7 @@
+#nullable enable
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using InventoryTracker.Data;
 using Microsoft.EntityFrameworkCore;
 using InventoryTracker.Models;
@@ -7,8 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllers();
-builder.Services.AddDbContext<AppDbContext>(options =>  
-    options.UseInMemoryDatabase("InventoryDb"));
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -25,9 +29,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the middleware pipeline
-app.UseSwagger();
+if(app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();app.UseSwagger();
 app.UseSwaggerUI();
+
+}
 
 app.UseHttpsRedirection();
 app.UseAuthorization();

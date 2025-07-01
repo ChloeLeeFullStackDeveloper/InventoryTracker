@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using InventoryTracker.Data;
 using InventoryTracker.Models;
-
+using System.Linq;
 namespace InventoryTracker.Controllers
 {
   [ApiController]

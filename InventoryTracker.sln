@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryTracker", "InventoryTracker.csproj", "{16595437-8965-473D-B572-DED8A4AB618D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryTracker.Tests", "InventoryTracker.Tests\InventoryTracker.Tests.csproj", "{5207ACA1-524A-4977-AA3B-6441CFD6AC38}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{16595437-8965-473D-B572-DED8A4AB618D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16595437-8965-473D-B572-DED8A4AB618D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16595437-8965-473D-B572-DED8A4AB618D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16595437-8965-473D-B572-DED8A4AB618D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5207ACA1-524A-4977-AA3B-6441CFD6AC38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5207ACA1-524A-4977-AA3B-6441CFD6AC38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5207ACA1-524A-4977-AA3B-6441CFD6AC38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5207ACA1-524A-4977-AA3B-6441CFD6AC38}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
