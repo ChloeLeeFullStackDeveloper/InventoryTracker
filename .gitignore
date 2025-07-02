@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# frontend config
+frontend/config.js
+
 # User-specific files
 *.rsuser
 *.suo

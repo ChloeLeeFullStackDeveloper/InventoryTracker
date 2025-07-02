@@ -96,8 +96,11 @@
     </thead>
     <tbody></tbody>
   </table>
-  <script>
-    const apiBaseUrl = "http://localhost:5000/api/product";
+  <script type="module">
+    import config from './config.js';
+
+    const BACKEND_PORT = 5230;
+    const apiBaseUrl = config.apiBaseUrl;
     const tableBody = document.querySelector("#productTable tbody");
     let editingProductId = null;
 
@@ -258,7 +261,7 @@
       const ProductData = { name, quantity, price };
 
       try {
-        const response = await fetch("http://localhost:5000/api/Product", {
+        const response = await fetch("http://localhost:5230/api/products", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

@@ -8,13 +8,10 @@ namespace InventoryTracker.Tests
         [Fact]
         public void Product_Should_Have_Correct_Name()
         {
-            // Arrange
-            var product = new Product { Name = "Laptop", Quantity = 5, Price = 1299.99 };
+            var product = new Product { Name = "Laptop", Quantity = 5, Price = 1299.99m };
 
-            // Act
             string actualName = product.Name;
 
-            // Assert
             Assert.Equal("Laptop", actualName);
         }
     }

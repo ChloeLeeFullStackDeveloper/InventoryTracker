@@ -5,25 +5,31 @@ using Microsoft.Extensions.Hosting;
 using InventoryTracker.Data;
 using Microsoft.EntityFrameworkCore;
 using InventoryTracker.Models;
+using Microsoft.Extensions.Configuration;
+using System.Linq;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
-// Add services to the container
 builder.Services.AddControllers();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
+);
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors(options => 
+builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
-    builder => 
+    corsBuilder =>
     {
-        builder.AllowAnyOrigin()
-        .AllowAnyHeader()
-        .AllowAnyMethod();
+        corsBuilder
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 
@@ -32,8 +38,7 @@ var app = builder.Build();
 if(app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();app.UseSwagger();
-app.UseSwaggerUI();
+    app.UseSwaggerUI();
 
 }
 
@@ -46,14 +51,17 @@ app.UseCors(MyAllowSpecificOrigins);
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-    context.Products.AddRange(
-        new Product { Name = "Laptop", Quantity = 5, Price = 1299.99m},
-        new Product { Name = "Mouse", Quantity = 25, Price = 39.99m},
-        new Product { Name = "Monitor", Quantity = 10, Price = 229.49m}
-    );
-
-    context.SaveChanges();
+    context.Database.EnsureCreated();
+    context.Database.Migrate();
+    if (!context.Products.Any())
+    {
+        context.Products.AddRange(
+            new Product { Name = "Laptop", Quantity = 5, Price = 1299.99m },
+            new Product { Name = "Mouse", Quantity = 25, Price = 39.99m },
+            new Product { Name = "Monitor", Quantity = 10, Price = 229.49m }
+        );
+        context.SaveChanges();
+    }
 }
 
 app.Run();
